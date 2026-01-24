@@ -26,7 +26,7 @@ const packageSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ["preparation", "sent", "received"]
+        enum: ["sent", "received"]
     },
     weight: {
         type: Number,

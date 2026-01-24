@@ -20,5 +20,7 @@ app.use((req, res, next) => {
 const usersRouter = require("./routes/users");
 app.use("/api/users", usersRouter);
 
+const packagesRouter = require("./routes/packages");
+app.use("/api/packages", packagesRouter);
 
 app.listen(5000);
