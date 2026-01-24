@@ -3,34 +3,43 @@ const mongoose = require("mongoose");
 const packageSchema = new mongoose.Schema({
     origin:{
         type: String,
-        require: true
+        required: true
     },
     destination: {
         type: String,
-        require: true
+        required: true
     },
     registeredBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
-        require: true
+        required: true
     },
     sentBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
-        require: true
+        required: true
     },
     recipient: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
-        require: true
+        required: true
     },
     status: {
         type: String,
-        enum: ["sent", "received"]
+        enum: ["preparation", "sent", "received"]
     },
     weight: {
         type: Number,
-        require: true
+        required: true
+    },
+    sendDate: {
+        type: Date,
+        required: true,
+        default: Date.now
+    },
+    receiveDate: {
+        type: Date,
+        required: false
     }
 })
 

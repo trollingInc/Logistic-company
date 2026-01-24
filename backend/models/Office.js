@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const officeSchema = new mongoose.Schema({
     address: {
         type: String,
-        require: true,
+        required: true,
         unique: true
     }
 })

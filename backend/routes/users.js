@@ -45,8 +45,7 @@ router.post("/", async (req, res) => {
 router.post("/login", async (req, res) => {
     const logUser = await user.findOne({"email": {"$eq": req.body.email}})
     if (!logUser) {
-        res.status(400).send("user not found");
-        return;
+        return res.status(400).send("user not found");
     }
 
     try {
@@ -68,6 +67,30 @@ router.post("/login", async (req, res) => {
 
 router.post("/test", authUser, async (req, res) => {
     console.log(req.user);
+})
+
+router.patch("/changeRole", authUser, async (req, res) => {
+    if (!req.user) {
+        return res.sendStatus(401);
+    } else if (req.user.role != "admin") {
+        return res.sendStatus(403);
+    } else if (!req.body.role || !["user", "office", "transporter"].includes(req.body.role)) {
+        return res.status(400).json({message: "Role does not exist. Available roles are 'user', 'office' and 'transporter'"});
+    }
+
+    const changeUser = await user.findOne({"email": {"$eq": req.body.email}});
+    if (!changeUser) {
+        return res.status(400).json({message: "User not found"});
+    }
+
+    try {
+        changeUser.role = req.body.role;
+        await changeUser.save();
+        res.sendStatus(200);
+    } catch (e) {
+        res.status(400).json({message: e.message});
+    }
+    
 })
 
 module.exports = router;
