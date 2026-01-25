@@ -1,5 +1,5 @@
 const office = require("../models/Office");
-const company = require("../models/Comapny");
+const company = require("../models/Company");
 
 const companyName = "Speedier";
 

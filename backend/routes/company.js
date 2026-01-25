@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const user = require("../models/User");
 const package = require("../models/Package");
-const company = require("../models/Comapny");
+const company = require("../models/Company");
 
 require('dotenv').config();
 const authUser = require("../middleware/authenticateUser");
