@@ -26,4 +26,7 @@ app.use("/api/packages", packagesRouter);
 const companyRouter = require("./routes/company");
 app.use("/api/company", companyRouter);
 
+const officeRouter = require("./routes/offices");
+app.use("/api/office", officeRouter);
+
 app.listen(5000);

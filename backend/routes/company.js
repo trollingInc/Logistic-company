@@ -1,10 +1,8 @@
 const express = require("express");
 const router = express.Router();
-const user = require("../models/User");
-const package = require("../models/Package");
 const company = require("../models/Company");
+const package = require("../models/Package");
 
-require('dotenv').config();
 const authUser = require("../middleware/authenticateUser");
 const companyName = "Speedier";
 
@@ -105,6 +103,53 @@ router.patch("/", authUser, async (req, res) => {
         res.sendStatus(200);
     } catch (e) {
         res.status(500).json({message: e.message});
+    }
+})
+
+
+// get revenue. if url params "from" and/or "to" are present, this function will take that into account and only show revenue during this time frame. else, it will show total revenue
+router.get("/revenue", authUser, async (req, res) => {
+    if (!req.user) {
+        return res.sendStatus(401);
+    }
+
+    if (req.user.role !== "admin") {
+        return res.sendStatus(403);
+    }
+
+    try {
+        let from = new Date(0);
+        let to = new Date();
+        if (req.query.from && /^\d+$/.test(req.query.from)) {
+            from = new Date(Number(req.query.from));
+        }
+        if (req.query.to && /^\d+$/.test(req.query.to)) {
+            to = new Date(Number(req.query.to));
+        }
+        if (from <= to) {
+            return res.status(400).send("End date cannot be less than or equal to the start date");
+        }
+
+        const receivedPackages = await package.find({
+            status: "received",
+            receiveDate: { 
+                $gte: from, 
+                $lte: toDate 
+            }
+        }).select("price");
+
+        if (receivedPackages.length == 0) {
+            res.status(200).json({message: "No revenue for this time period", revenue: 0})
+        }
+
+        let revenue = 0;
+        receivedPackages.forEach((p) => {
+            revenue += p.price;
+        })
+
+        res.status(200).json({revenue: revenue});
+    } catch (e) {
+        res.status(500).send(e.message);
     }
 })
 
