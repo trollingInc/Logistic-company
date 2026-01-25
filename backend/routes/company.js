@@ -25,17 +25,12 @@ router.post("/", authUser, async (req, res) => {
         return res.status(400).json({message: "You already have created a company"});
     }
 
-    const priceFromAddress = parseFloat(req.body.priceFromAddress);
-    const priceToAddress = parseFloat(req.body.priceToAddress);
-    const pricePerKg = parseFloat(req.body.pricePerKg);
-    const priceToOffice = parseFloat(req.body.priceToOffice);
-
     try {
         const newC = new company({
-            priceFromAddress: priceFromAddress,
-            priceToAddress: priceToAddress,
-            pricePerKg: pricePerKg,
-            priceToOffice: priceToOffice,
+            priceFromAddress: 1,
+            priceToAddress: 1,
+            pricePerKg: 1,
+            priceToOffice: 1,
             name: companyName
         });
 
