@@ -24,13 +24,20 @@ const packageSchema = new mongoose.Schema({
         ref: "User",
         required: true
     },
+    courier: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true
+    },
     status: {
         type: String,
         enum: ["sent", "received"]
     },
     weight: {
         type: Number,
-        required: true
+        required: true,
+        min: 0,
+        max: 200
     },
     sendDate: {
         type: Date,
@@ -40,6 +47,10 @@ const packageSchema = new mongoose.Schema({
     receiveDate: {
         type: Date,
         required: false
+    },
+    price: {
+        type: Number,
+        required: true
     }
 })
 

@@ -14,6 +14,8 @@ const {
     getPackagesReceivedByUser
 } = require("../utils/getPackages");
 
+const calculatePackagePrice = require("../utils/calculatePackagePrice");
+
 // get user's packages
 router.get("/", authUser, async (req, res) => {
     if (!req.user) {
@@ -24,7 +26,16 @@ router.get("/", authUser, async (req, res) => {
     res.status(200).json({packages: packages});
 })
 
-// get packages with employee privileges
+
+/**
+ * get packages with extra features for employees
+ * URL params:
+ * ! Params are exclusive. IF you use one, do not use other params as you will not receive what you want!
+ * employee - employee email. when given, request will return all packages registered by this employee
+ * sentOnly - could be any non null value. when given, request will return all packages with status "sent"
+ * received - could be any non null value. when given, request will return all packages with status "received"
+ * no params - if you do not give any params, all packages will be returned.
+ */
 router.get("/employeeAccess", authUser, async (req, res) => {
     const employee = req.query.employee;
     const sentButNotReceived = req.query.sentOnly;
@@ -56,24 +67,6 @@ router.get("/employeeAccess", authUser, async (req, res) => {
     }
 });
 
-// get all packages received by a specific user
-router.get("/employeeAccess/userRelated/received/:usrEmail", authUser, async (req, res) => {
-    if (!req.user) {
-        return res.sendStatus(401);
-    }
-
-    if (req.user.role === "user" && req.user.email != req.params.usrEmail) {
-        return res.sendStatus(403);
-    }
-
-    const usr = await user.findOne({email: req.params.usrEmail});
-    if (!usr) {
-        return res.status(400).json({message: "User email not found"});
-    }
-
-    const packages = getPackagesReceivedByUser(usr._id);
-    res.status(200).json({packages: packages});
-})
 
 // get all packages received by a specific user
 router.get("/employeeAccess/userRelated/received/:usrEmail", authUser, async (req, res) => {
@@ -93,6 +86,27 @@ router.get("/employeeAccess/userRelated/received/:usrEmail", authUser, async (re
     const packages = getPackagesReceivedByUser(usr._id);
     res.status(200).json({packages: packages});
 })
+
+
+// get all packages received by a specific user
+router.get("/employeeAccess/userRelated/received/:usrEmail", authUser, async (req, res) => {
+    if (!req.user) {
+        return res.sendStatus(401);
+    }
+
+    if (req.user.role === "user" && req.user.email != req.params.usrEmail) {
+        return res.sendStatus(403);
+    }
+
+    const usr = await user.findOne({email: req.params.usrEmail});
+    if (!usr) {
+        return res.status(400).json({message: "User email not found"});
+    }
+
+    const packages = getPackagesReceivedByUser(usr._id);
+    res.status(200).json({packages: packages});
+})
+
 
 // change package status
 router.patch("/changeStatus/:id", authUser, async (req, res) => {
@@ -104,29 +118,26 @@ router.patch("/changeStatus/:id", authUser, async (req, res) => {
         return res.sendStatus(403);
     }
 
-    if (req.body.status != "sent" && req.body.status != "received") {
-        return res.status(400).json({message: "Invalid status"});
-    }
-
     const pckg = await package.findById(req.params.id);
 
     if (!pckg) {
         return res.status(400).json({message: "Package not found!"});
     }
 
+    if (pckg.receiveDate) {
+        return res.status(400).json({message: "Package has already been received"});
+    }
+
     try {
-        pckg.status = req.body.status;
-        if (req.body.status === "sent") {
-            pckg.receiveDate = null;
-        } else {
-            pckg.receiveDate = Date.now();
-        }
+        pckg.status = "received";
+        pckg.receiveDate = Date.now();
         await pckg.save();
         res.sendStatus(200);
     } catch (e) {
         res.status(500).json({message: e.message});
     }
 })
+
 
 // create package
 router.post("/", authUser, async (req, res) => {
@@ -138,11 +149,12 @@ router.post("/", authUser, async (req, res) => {
         return res.sendStatus(403);
     }
 
-    if (!req.body.recipient || !req.body.origin || !req.body.destination || !req.body.weight || !req.body.sender) {
+    if (!req.body.recipient || !req.body.origin || !req.body.destination || !req.body.weight || !req.body.sender || !req.body.courier) {
         return res.status(400).json({message: "Not enough data. Make sure you have filled every field"});
     }
 
-    if (req.body.weight < 0 || req.body.weight > 200) {
+    const weight = parseFloat(req.body.weight);
+    if (weight < 0 || weight > 200) {
         return res.status(400).json({message: "Weight must be between 0 and 200"});
     }
 
@@ -154,24 +166,36 @@ router.post("/", authUser, async (req, res) => {
     if (!recipient) {
         return res.status(400).json({message: "Recipient user cannot be found"});
     }
+    const courier = await user.findOne({email: req.body.courier});
+    if (!courier || courier.role !== "courier") {
+        return res.status(400).json({message: "Courier user cannot be found"});
+    }
+
+    const price = await calculatePackagePrice(weight, req.body.origin, req.body.destination);
+    if (!price) {
+        return res.status(500).json({message: "Something went wrong when calculating the price: " + price})
+    }
 
     const newPackage = new package({
         origin: req.body.origin,
         destination: req.body.destination,
         sentBy: sender._id,
         recipient: recipient._id,
-        weight: req.body.weight,
+        weight: weight,
         registeredBy: req.user.id,
-        status: "sent"
-    })
+        status: "sent",
+        courier: courier._id,
+        price: price
+    });
 
     try{
         await newPackage.save();
         res.sendStatus(200);
     } catch (e) {
-        res.status(500).json({message: e.message})
+        res.status(500).json({message: e.message});
     }
 })
+
 
 router.patch("/changeDestination/:id", authUser, async (req, res) => {
     if (!req.user) {
@@ -199,11 +223,171 @@ router.patch("/changeDestination/:id", authUser, async (req, res) => {
     }
 
     try {
+        const price = await calculatePackagePrice(pckg.weight, pckg.origin, newDestination);
+        if (!price) {
+            throw `Something went wrong while calculating price`
+        }
+
         pckg.destination = newDestination;
+        pckg.price = price;
         await pckg.save();
         res.sendStatus(200);
     } catch (e) {
         res.status(500).json({message: e.message});
+    }
+})
+
+
+// change the recipient. Requires "recipient" containing the email of the new recipient to be present in the body of the request
+router.patch("/changeRecipient/:id", authUser, async (req, res) => {
+    if (!req.user) {
+        return res.sendStatus(401);
+    }
+
+    if (req.user.role !== "office" && req.user.role !== "admin") {
+        return res.sendStatus(403);
+    }
+
+    if (!req.body.recipient) {
+        return res.status(400).json({message: "No new recipient provided"});
+    }
+
+    const pckg = await package.findById(req.params.id);
+
+    if (!pckg) {
+        return res.status(400).json({message: "Package not found!"});
+    }
+
+
+    if (pckg.status === "received") {
+        return res.status(400).json({message: "Cannot change recipient on a package which has already been received"});
+    }
+
+    const newRecipient = await user.findOne({email: req.body.recipient});
+    if (!newRecipient) {
+        return res.status(400).json({message: "This recipient does not exist"});
+    }
+
+    try {
+        pckg.recipient = newRecipient;
+        await pckg.save();
+        res.sendStatus(200);
+    } catch (e) {
+        res.status(500).json({message: e.message});
+    }
+})
+
+
+// change the courier. Requires "courier" containing the email of the new recipient to be present in the body of the request
+router.patch("/changeCourier/:id", authUser, async (req, res) => {
+    if (!req.user) {
+        return res.sendStatus(401);
+    }
+
+    if (req.user.role !== "office" && req.user.role !== "admin") {
+        return res.sendStatus(403);
+    }
+
+    if (!req.body.courier) {
+        return res.status(400).json({message: "No new courier provided"});
+    }
+
+    const pckg = await package.findById(req.params.id);
+
+    if (!pckg) {
+        return res.status(400).json({message: "Package not found!"});
+    }
+
+    if (pckg.status === "received") {
+        return res.status(400).json({message: "Cannot change recipient on a package which has already been received"});
+    }
+
+    const newCourier = await user.findOne({email: req.body.courier});
+    if (!newCourier) {
+        return res.status(400).json({message: "This courier does not exist"});
+    }
+
+    try {
+        pckg.courier = newCourier;
+        await pckg.save();
+        res.sendStatus(200);
+    } catch (e) {
+        res.status(500).json({message: e.message});
+    }
+})
+
+
+// change package weight. request body should include the value for the new weight. key should be "weight"
+router.patch("/changeWeight/:id", authUser, async (req, res) => {
+    if (!req.user) {
+        return res.sendStatus(401);
+    }
+
+    if (req.user.role !== "office" && req.user.role !== "admin") {
+        return res.sendStatus(403);
+    }
+
+    const newWeight = parsefloat(req.body.weight);
+
+    if (!newWeight || newWeight < 0 || newWeight > 200) {
+        return res.status(400).json({message: "Invalid weight value"});
+    }
+
+    const pckg = await package.findById(req.params.id);
+
+    if (!pckg) {
+        return res.status(400).json({message: "Package not found!"});
+    }
+
+    if (pckg.status === "received") {
+        return res.status(400).json({message: "Cannot change weight on a package which has already been received"});
+    }
+
+    try {
+        const price = await calculatePackagePrice(newWeight, pckg.origin, pckg.destination);
+        if (!price) {
+            throw `Something went wrong with calculating the new price`
+        }
+
+        pckg.weight = newWeight;
+        await pckg.save();
+        res.sendStatus(200);
+    } catch (e) {
+        res.status(500).json({message: e.message});
+    }
+})
+
+
+// delete package
+router.delete("/:id", authUser, async (req, res) => {
+    if (!req.user) {
+        return res.sendStatus(401);
+    }
+
+    if (req.user.role !== "office" && req.user.role !== "admin") {
+        return res.sendStatus(403);
+    }
+
+    try{
+        await package.findOneAndDelete({_id: req.params.id});
+        res.sendStatus(200);
+    } catch (e) {
+        res.status(400).json({message: e.message});
+    }
+})
+
+
+// get price before creating the package. body should have "weight", "origin" and "destination"
+router.post("/getPrice", async (req, res) => {
+    if (!req.body.weight || !req.body.origin || !req.body.destination) {
+        return res.status(400).json({message: "Not enough data. Make sure to give values for weight, origin and destination"});
+    }
+
+    const price = await calculatePackagePrice(req.body.weight, req.body.origin, req.body.destination);
+    if (price) {
+        res.status(200).json({price: price});
+    } else {
+        res.status(400).json({message: "something went wrong"});
     }
 })
 

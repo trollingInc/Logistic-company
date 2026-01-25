@@ -23,4 +23,7 @@ app.use("/api/users", usersRouter);
 const packagesRouter = require("./routes/packages");
 app.use("/api/packages", packagesRouter);
 
+const companyRouter = require("./routes/company");
+app.use("/api/company", companyRouter);
+
 app.listen(5000);

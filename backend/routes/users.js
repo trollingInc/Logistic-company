@@ -73,8 +73,8 @@ router.patch("/changeRole", authUser, async (req, res) => {
         return res.sendStatus(401);
     } else if (req.user.role != "admin") {
         return res.sendStatus(403);
-    } else if (!req.body.role || !["user", "office", "transporter"].includes(req.body.role)) {
-        return res.status(400).json({message: "Role does not exist. Available roles are 'user', 'office' and 'transporter'"});
+    } else if (!req.body.role || !["user", "office", "courier"].includes(req.body.role)) {
+        return res.status(400).json({message: "Role does not exist. Available roles are 'user', 'office' and 'courier'"});
     }
 
     const changeUser = await user.findOne({"email": {"$eq": req.body.email}});
@@ -90,6 +90,116 @@ router.patch("/changeRole", authUser, async (req, res) => {
         res.status(400).json({message: e.message});
     }
     
+})
+
+router.patch("/changePassword", authUser, async (req, res) => {
+    if (!req.user) {
+        return res.sendStatus(401);
+    } 
+
+    if (!req.body.newPass || !req.body.oldPass) {
+        return res.status(400).json({message: "Missing data"});
+    }
+
+    const usr = await user.findById(req.user.id);
+    if (!usr) {
+        return res.status(400).json({message: "You don't exist."});
+    }
+
+    try {
+        if (await bcrypt.compare(req.body.oldPass, usr.password)) {
+            const hPwd = await bcrypt.hash(req.body.newPass, 10);
+
+            usr.password = hPwd;
+            await usr.save();
+            
+            userForToken = {
+                email: usr.email,
+                id: usr._id,
+                role: usr.role
+            };
+            const jwtToken = jwt.sign(userForToken, process.env.JWT_TOKEN_SECRET, {expiresIn: "60m"});
+
+            res.json({token: jwtToken})
+        } else {
+            res.status(400).json({message: "old password does not match"});
+        }
+    } catch (e) {
+        res.status(500).json({message: e.message});
+    }
+})
+
+router.delete("/", authUser, async (req, res) => {
+    if (!req.user) {
+        return res.sendStatus(401);
+    } 
+
+    if (req.user.role === "office" || req.user.role === "courier") {
+        return res.status(400).json({message: "Ask the admin to delete your account"});
+    }
+
+    if (req.user.role === "admin") {
+        if (req.query.userId) {
+            return res.status(400).json({message: "No userId given"});
+        }
+
+        try {
+            await user.deleteOne({_id: req.query.userId});
+            res.status(200);
+        } catch (e) {
+            res.status(500).json({message: e.message});
+        }
+    } else {
+        try {
+            await user.deleteOne({_id: req.user.id});
+            res.status(200);
+        } catch (e) {
+            res.status(500).json({message: e.message});
+        }
+    }
+})
+
+
+// get all employees
+router.get("/employees", authUser, async (req, res) => {
+    if (!req.user) {
+        return res.sendStatus(401);
+    }
+
+    if (req.user.role === "user") {
+        return res.sendStatus(403);
+    }
+
+    const employees = await user.find({$or: [
+        {role: "office"},
+        {role: "courier"}
+    ]});
+
+    if (employees.length == 0) {
+        return res.status(400).json({message: "No employees found"});
+    }
+
+    res.status(200).json({employees: employees});
+})
+
+
+// get all customers
+router.get("/customers", authUser, async (req, res) => {
+    if (!req.user) {
+        return res.sendStatus(401);
+    }
+
+    if (req.user.role === "user") {
+        return res.sendStatus(403);
+    }
+
+    const customers = await user.find({role: "user"});
+
+    if (customers.length == 0) {
+        return res.status(400).json({message: "No customers found"});
+    }
+
+    res.status(200).json({customers: customers});
 })
 
 module.exports = router;
