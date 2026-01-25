@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <script src="../scripts/auth.js" defer></script>
+    <link rel="stylesheet" href="../css/login-register.css">
+</head>
+
+<body>
+    <div class="container">
+        <form onsubmit="register(); return false">
+            <div class="input-group">
+                <input type="email" name="remail" id="remail" placeholder="Email" required class="email-user-pass">
+                <input type="password" name="rpass" id="rpass" placeholder="Password">
+            </div>
+            <button type="submit" class="btn-primary">Register</button>
+        </form>
+        <div class="form-footer">
+            <p>Already have an account? <a href="login.html">Login</a></p>
+        </div>
+    </div>
+</body>
+
+</html>
