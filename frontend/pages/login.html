@@ -11,13 +11,16 @@
 
 <body>
     <div class="container">
-        <form onsubmit="login()">
+        <form onsubmit="login(); return false">
             <div class="input-group">
-                <input type="email" name="lemail" id="lemail" required class="email-user-pass">
-                <input type="password" name="lpass" id="lpass">
+                <input type="email" name="lemail" id="lemail" required class="email-user-pass" placeholder="Email">
+                <input type="password" name="lpass" id="lpass" required class="email-user-pass" placeholder="Password">
             </div>
             <button type="submit" class="btn-primary">Login</button>
         </form>
+        <div class="form-footer">
+            <p>Don't have an account? <a href="register.html">Register</a></p>
+        </div>
     </div>
 </body>
 

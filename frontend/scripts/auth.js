@@ -1,9 +1,18 @@
 const registerEmail = document.getElementById("remail");
 const registerPassword = document.getElementById("rpass");
 const loginEmail = document.getElementById("lemail");
-const loginPassword = document.getElementById("lpassword");
+const loginPassword = document.getElementById("lpass");
+const confirmPassword = document.getElementById("confirmPassword")
+
+function checkPasswords() {
+    return registerPassword.value === confirmPassword.value
+}
 
 async function register() {
+    if (!checkPasswords()) {
+        alert("Passwords do not match! Please try again.")
+        return;
+    }
     fetch("http://localhost:5000/api/users/", {
         method: "POST",
         headers: {
@@ -17,8 +26,8 @@ async function register() {
         console.log(r);
         if (r.token) {
             sessionStorage.setItem("jwt", r.token);
-            console.log(location.href)
-            location.href = "../pages/login.html"
+            console.log(location.href);
+            location.href = "../pages/login.html";
         }
     })
 }
@@ -48,13 +57,15 @@ async function login() {
             "Content-Type": "application/json"
         },
         body: JSON.stringify({
-            email: registerEmail.value,
-            password: registerPassword.value
+            email: loginEmail.value,
+            password: loginPassword.value
         })
     }).then(r => r.json()).then(r => {
         if (r.token) {
             sessionStorage.setItem("jwt", r.token);
-            location.href = "../pages/index.html"
+            console.log(location.href);
+            location.href = "../pages/index.html";
         }
     })
+
 }
