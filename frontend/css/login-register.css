@@ -4,7 +4,6 @@
     margin-bottom: 10px;
 }
 
-/* Основен ресет */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -21,14 +20,13 @@ body {
     padding: 20px;
 }
 
-/* Контейнер на формата */
 .form-wrapper {
     background: white;
     padding: 40px;
     border-radius: 10px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     width: 100%;
-    max-width: 400px; /* Ограничава ширината на големи екрани */
+    max-width: 400px; 
 }
 
 h2 {
@@ -44,7 +42,6 @@ p {
     font-size: 0.9rem;
 }
 
-/* Полета за въвеждане */
 .input-group {
     margin-bottom: 20px;
 }
@@ -72,7 +69,6 @@ p {
     outline: none;
 }
 
-/* Бутон */
 .btn-primary {
     width: 100%;
     padding: 12px;
@@ -89,7 +85,6 @@ p {
     background-color: #0056b3;
 }
 
-/* Линк за вход */
 .form-footer {
     margin-top: 20px;
     text-align: center;
@@ -105,7 +100,6 @@ p {
     margin-top: 10px;
 }
 
-/* Медия заявка за мобилни устройства (Респонсив дизайн) */
 @media (max-width: 480px) {
     .form-wrapper {
         padding: 20px;

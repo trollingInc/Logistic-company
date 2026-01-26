@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create package</title>
+    <script src="../scripts/auth.js" defer></script>
+    <script src="../scripts/create-package.js" defer></script>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/form.css"> </head>
+<body>
+    <nav class="navbar">
+        <div class="logo">Speedier</div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="employee-packages.html">All packages</a></li>
+            <li><a href="#" onclick="logout()">Log out</a></li>
+        </ul>
+    </nav>
+
+    <div class="container form-container">
+        <h2>Register a new package</h2>
+        
+        <form id="createPackageForm">
+            <div class="form-section">
+                <h3>Details about the package</h3>
+                
+                <div class="input-group">
+                    <label>From (Origin)</label>
+                    <input type="text" id="origin" placeholder="Example Sofia" required>
+                </div>
+
+                <div class="input-group">
+                    <label>To (Destination)</label>
+                    <input type="text" id="destination" placeholder="Example Plovdiv" required>
+                </div>
+
+                <div class="input-group">
+                    <label>Weight (kg)</label>
+                    <input type="number" id="weight" step="0.1" min="0.1" max="200" placeholder="0.00" required>
+                </div>
+
+                <button type="button" class="btn-secondary" onclick="checkPrice()">Check delivery price</button>
+                <div id="priceDisplay" class="price-box" style="display:none;">
+                    Calculated Price: <span id="calculatedPrice">0.00</span> euro
+                </div>
+            </div>
+
+            <hr>
+
+            <div class="form-section">
+                <h3>Participants</h3>
+                
+                <div class="input-group">
+                    <label>Sender email</label>
+                    <input type="email" id="sender" placeholder="client@example.com" required>
+                </div>
+
+                <div class="input-group">
+                    <label>Recipient email</label>
+                    <input type="email" id="recipient" placeholder="receiver@example.com" required>
+                </div>
+
+                <div class="input-group">
+                    <label>Courier email</label>
+                    <input type="email" id="courier" placeholder="courier@example.com" required>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-primary full-width">Register package</button>
+            </div>
+            
+            <p id="messageBox" class="error-msg"></p>
+        </form>
+    </div>
+
+</body>
+</html>

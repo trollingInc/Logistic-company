@@ -62,10 +62,20 @@ async function login() {
         })
     }).then(r => r.json()).then(r => {
         if (r.token) {
+            const payload = JSON.parse(atob(r.token.split('.')[1]));
+            const role = payload.role;
             sessionStorage.setItem("jwt", r.token);
+            sessionStorage.setItem("userEmail", loginEmail.value);
+            sessionStorage.setItem("userRole", role);
+            console.log("Login successful, redirecting...");
             console.log(location.href);
             location.href = "../pages/index.html";
         }
     })
 
+}
+
+function logout() {
+    sessionStorage.removeItem('jwt');
+    window.location.href = 'login.html';
 }

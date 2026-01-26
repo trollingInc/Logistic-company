@@ -1,13 +1,62 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bg">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
+    <title>Home - Choose a panel</title>
     <script src="../scripts/auth.js" defer></script>
+    <link rel="stylesheet" href="../css/style.css">
 </head>
+
 <body>
-    <p>test</p>
-    
+
+    <nav class="navbar">
+        <div class="logo">Speedier</div>
+        <ul class="nav-links">
+            <li><a href="#" onclick="logout()">Log out</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <h1 style="text-align: center; margin-top: 40px;">Welcome!</h1>
+        <p style="text-align: center;">Please select the panel for your needs:</p>
+
+        <div class="dashboard-choices">
+
+            <div class="choice-card">
+                <h3>Client panel</h3>
+                <p>Look at your packages</p>
+                <a href="client-packages.html" class="btn-link">Entry</a>
+            </div>
+
+            <div class="choice-card">
+                <h3>Employee panel</h3>
+                <p>Administration for packages</p>
+                <button onclick="checkEmployeeAccess()" class="btn-link btn-restricted"
+                    style="border:none; width:100%; cursor:pointer;">
+                    Entry for employees
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+
+        function checkEmployeeAccess() {
+            const role = sessionStorage.getItem('userRole');
+
+
+            const allowedRoles = ['office', 'admin', 'courier'];
+
+            if (allowedRoles.includes(role)) {
+
+                window.location.href = "employee-packages.html";
+            } else {
+
+                alert("You don't have access! This panel is only for employees.");
+            }
+        }
+    </script>
 </body>
 </html>

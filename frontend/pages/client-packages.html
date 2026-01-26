@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <title>My packages</title>
+    <script src="../scripts/auth.js" defer></script>
+    <script src="../scripts/client.js" defer></script>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/table.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">Speedier (Client)</div>
+        <ul class="nav-links">
+            <li><a href="#" class="active">My packages</a></li>
+            <li><a href="index.html" class="active">Home</a></li>
+            <li><a href="#" onclick="logout()">Log out</a></li>
+        </ul>
+    </nav>
+
+    <div class="container table-container">
+        <h3>Packages sent by me</h3>
+        <table class="packages-table">
+            <tbody id="sentTable"></tbody>
+        </table>
+
+        <h3 style="margin-top:30px">Packages sent to me</h3>
+        <table class="packages-table">
+            <tbody id="receivedTable"></tbody>
+        </table>
+    </div>
+</body>
+</html>
