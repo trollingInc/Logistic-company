@@ -56,13 +56,13 @@ router.get("/employeeAccess", authUser, async (req, res) => {
         const packages = await getPackagesRegisteredByEmployee(employee._id);
         res.status(200).json({packages: packages});
     } else if (sentButNotReceived) { // packages which are sent but are not received
-        const packages = getPackagesWithStatusSent();
+        const packages = await getPackagesWithStatusSent();
         res.status(200).json({packages: packages});
     } else if (sentAndReceived) { // packages which are received
-        const packages = getPackagesWithStatusReceived();
+        const packages = await getPackagesWithStatusReceived();
         res.status(200).json({packages: packages});
     } else { // all packages
-        const packages = getAllPackages();
+        const packages = await getAllPackages();
         res.status(200).json({packages: packages});
     }
 });
@@ -88,8 +88,8 @@ router.get("/employeeAccess/userRelated/received/:usrEmail", authUser, async (re
 })
 
 
-// get all packages received by a specific user
-router.get("/employeeAccess/userRelated/received/:usrEmail", authUser, async (req, res) => {
+// get all packages sent by a specific user
+router.get("/employeeAccess/userRelated/sent/:usrEmail", authUser, async (req, res) => {
     if (!req.user) {
         return res.sendStatus(401);
     }
@@ -103,7 +103,7 @@ router.get("/employeeAccess/userRelated/received/:usrEmail", authUser, async (re
         return res.status(400).json({message: "User email not found"});
     }
 
-    const packages = getPackagesReceivedByUser(usr._id);
+    const packages = getPackagesSentByUser(usr._id);
     res.status(200).json({packages: packages});
 })
 
