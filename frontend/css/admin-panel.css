@@ -1,0 +1,46 @@
+.vp {
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 60vh;
+}
+
+.input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+    transition: border-color 0.3s;
+}
+
+.input:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+#pricing-form {
+    display: flex;
+    flex-direction: column;
+    min-width: 50vw;
+    max-width: 400px;
+}
+
+#pricing-form :nth-child(2n) {
+    margin-bottom: 1rem;
+}
+
+#form-disclaimer {
+    font-size: 0.75rem;
+    color: grey;
+}
+
+@media (max-width: 600px) {
+    #pricing-form {
+        min-width: none;
+        max-width: none;
+        width: 90vw;
+    }
+}

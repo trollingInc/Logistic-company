@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="../css/admin-panel.css">
+    <script src="../scripts/admin-panel.js" defer></script>
+</head>
+
+<body>
+    <div class="vp">
+        <h3>Update pricing</h3>
+        <label id="form-disclaimer"><em>*Updates to pricing will not be reflected in packages which are already
+                created</em></label>
+        <form onsubmit="updatePricing(); return false;" id="pricing-form">
+            <label for="price-per-kg">Price per kg</label>
+            <input type="text" name="price-per-kg" id="price-per-kg">
+        </form>
+    </div>
+</body>
+
+</html>
