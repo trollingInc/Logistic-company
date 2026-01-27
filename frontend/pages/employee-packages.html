@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="bg">
+
 <head>
     <meta charset="UTF-8">
     <title>All packages (Employee)</title>
@@ -8,6 +9,7 @@
     <link rel="stylesheet" href="../css/style.css">
     <link rel="stylesheet" href="../css/table.css">
 </head>
+
 <body>
     <nav class="navbar">
         <div class="logo">Speedier (Employee)</div>
@@ -26,11 +28,73 @@
                     <th>Sender</th>
                     <th>Recipient</th>
                     <th>Route</th>
+                    <th>Weight</th>
+                    <th>Price</th>
                     <th>Status</th>
+                    <th>Deletion</th>
                 </tr>
             </thead>
             <tbody id="allPackagesBody"></tbody>
         </table>
+        <div class="table-container" style="margin-top: 50px; border-top: 4px solid #007bff;">
+            <h3>Generate Reports</h3>
+
+            <div style="display: flex; gap: 15px; flex-wrap: wrap; align-items: flex-end; margin-bottom: 20px;">
+
+                <div style="flex: 1; min-width: 250px;">
+                    <label style="font-weight: bold;">Select Report Type:</label>
+                    <select id="reportType" onchange="toggleReportInputs()"
+                        style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                        <option value="none" disabled selected>-- Choose a Report --</option>
+                        <option value="all_employees">All Employees</option>
+                        <option value="all_clients">All Clients</option>
+                        <option value="all_packages">All Registered Packages</option>
+                        <option value="by_employee">Packages Registered by Employee</option>
+                        <option value="sent_only">Sent Packages (Not Received)</option>
+                        <option value="sent_by_client">Packages Sent by Client</option>
+                        <option value="received_by_client">Packages Received by Client</option>
+                        <option value="revenue">Company Revenue (Period)</option>
+                    </select>
+                </div>
+
+                <div id="inputEmailGroup" style="display: none; flex: 1;">
+                    <label style="font-weight: bold;">Email Address:</label>
+                    <input type="email" id="reportEmail" placeholder="user@example.com"
+                        style="width: 100%; padding: 10px; margin: 0;">
+                </div>
+
+                <div id="inputDateGroup" style="display: none; gap: 10px; flex: 1;">
+                    <div style="flex:1">
+                        <label style="font-weight: bold;">Start Date:</label>
+                        <input type="date" id="startDate" style="width: 100%; padding: 10px; margin: 0;">
+                    </div>
+                    <div style="flex:1">
+                        <label style="font-weight: bold;">End Date:</label>
+                        <input type="date" id="endDate" style="width: 100%; padding: 10px; margin: 0;">
+                    </div>
+                </div>
+
+                <button onclick="generateReport()" class="btn-primary" style="height: 42px;">Generate Report</button>
+            </div>
+
+            <div id="revenueDisplay"
+                style="display:none; background: #e8f5e9; padding: 15px; border-radius: 5px; margin-bottom: 15px; text-align: right; border: 1px solid #4caf50;">
+                <span style="font-size: 1.2rem; color: #2e7d32;">Total Revenue for Period: </span>
+                <span id="revenueAmount" style="font-size: 1.5rem; font-weight: bold; color: #1b5e20;">0.00</span>
+                <span style="font-size: 1.2rem; color: #1b5e20;"> EUR</span>
+            </div>
+
+            <table class="packages-table">
+                <thead id="reportTableHead">
+                    <tr>
+                        <th>Results will appear here...</th>
+                    </tr>
+                </thead>
+                <tbody id="reportTableBody">
+                </tbody>
+            </table>
+        </div>
     </div>
 </body>
+
 </html>
