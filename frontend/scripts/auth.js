@@ -79,3 +79,17 @@ function logout() {
     sessionStorage.removeItem('jwt');
     window.location.href = 'login.html';
 }
+function checkEmployeeAccess() {
+            const role = sessionStorage.getItem('userRole');
+
+
+            const allowedRoles = ['office', 'admin', 'courier'];
+
+            if (allowedRoles.includes(role)) {
+
+                window.location.href = "employee-packages.html";
+            } else {
+
+                alert("You don't have access! This panel is only for employees.");
+            }
+        }
