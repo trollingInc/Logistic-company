@@ -198,167 +198,6 @@ router.post("/", authUser, async (req, res) => {
 })
 
 
-router.patch("/changeDestination/:id", authUser, async (req, res) => {
-    if (!req.user) {
-        return res.sendStatus(401);
-    }
-
-    if (req.user.role !== "office" && req.user.role !== "admin") {
-        return res.sendStatus(403);
-    }
-
-    const newDestination = req.body.destination?.trim();
-    if (!newDestination) {
-        return res.status(400).json({message: "Destination cannot be empty"})
-    }
-
-    const pckg = await package.findById(req.params.id);
-
-    if (!pckg) {
-        return res.status(400).json({message: "Package not found!"});
-    }
-
-
-    if (pckg.status === "received") {
-        return res.status(400).json({message: "Cannot change destination on a package which has already been received"});
-    }
-
-    try {
-        const price = await calculatePackagePrice(pckg.weight, pckg.origin, newDestination);
-        if (!price) {
-            throw `Something went wrong while calculating price`
-        }
-
-        pckg.destination = newDestination;
-        pckg.price = price;
-        await pckg.save();
-        res.sendStatus(200);
-    } catch (e) {
-        res.status(500).json({message: e.message});
-    }
-})
-
-
-// change the recipient. Requires "recipient" containing the email of the new recipient to be present in the body of the request
-router.patch("/changeRecipient/:id", authUser, async (req, res) => {
-    if (!req.user) {
-        return res.sendStatus(401);
-    }
-
-    if (req.user.role !== "office" && req.user.role !== "admin") {
-        return res.sendStatus(403);
-    }
-
-    if (!req.body.recipient) {
-        return res.status(400).json({message: "No new recipient provided"});
-    }
-
-    const pckg = await package.findById(req.params.id);
-
-    if (!pckg) {
-        return res.status(400).json({message: "Package not found!"});
-    }
-
-
-    if (pckg.status === "received") {
-        return res.status(400).json({message: "Cannot change recipient on a package which has already been received"});
-    }
-
-    const newRecipient = await user.findOne({email: req.body.recipient});
-    if (!newRecipient) {
-        return res.status(400).json({message: "This recipient does not exist"});
-    }
-
-    try {
-        pckg.recipient = newRecipient;
-        await pckg.save();
-        res.sendStatus(200);
-    } catch (e) {
-        res.status(500).json({message: e.message});
-    }
-})
-
-
-// change the courier. Requires "courier" containing the email of the new recipient to be present in the body of the request
-router.patch("/changeCourier/:id", authUser, async (req, res) => {
-    if (!req.user) {
-        return res.sendStatus(401);
-    }
-
-    if (req.user.role !== "office" && req.user.role !== "admin") {
-        return res.sendStatus(403);
-    }
-
-    if (!req.body.courier) {
-        return res.status(400).json({message: "No new courier provided"});
-    }
-
-    const pckg = await package.findById(req.params.id);
-
-    if (!pckg) {
-        return res.status(400).json({message: "Package not found!"});
-    }
-
-    if (pckg.status === "received") {
-        return res.status(400).json({message: "Cannot change recipient on a package which has already been received"});
-    }
-
-    const newCourier = await user.findOne({email: req.body.courier});
-    if (!newCourier) {
-        return res.status(400).json({message: "This courier does not exist"});
-    }
-
-    try {
-        pckg.courier = newCourier;
-        await pckg.save();
-        res.sendStatus(200);
-    } catch (e) {
-        res.status(500).json({message: e.message});
-    }
-})
-
-
-// change package weight. request body should include the value for the new weight. key should be "weight"
-router.patch("/changeWeight/:id", authUser, async (req, res) => {
-    if (!req.user) {
-        return res.sendStatus(401);
-    }
-
-    if (req.user.role !== "office" && req.user.role !== "admin") {
-        return res.sendStatus(403);
-    }
-
-    const newWeight = parsefloat(req.body.weight);
-
-    if (!newWeight || newWeight < 0 || newWeight > 200) {
-        return res.status(400).json({message: "Invalid weight value"});
-    }
-
-    const pckg = await package.findById(req.params.id);
-
-    if (!pckg) {
-        return res.status(400).json({message: "Package not found!"});
-    }
-
-    if (pckg.status === "received") {
-        return res.status(400).json({message: "Cannot change weight on a package which has already been received"});
-    }
-
-    try {
-        const price = await calculatePackagePrice(newWeight, pckg.origin, pckg.destination);
-        if (!price) {
-            throw `Something went wrong with calculating the new price`
-        }
-
-        pckg.weight = newWeight;
-        await pckg.save();
-        res.sendStatus(200);
-    } catch (e) {
-        res.status(500).json({message: e.message});
-    }
-})
-
-
 // delete package
 router.delete("/:id", authUser, async (req, res) => {
     if (!req.user) {
@@ -389,6 +228,73 @@ router.post("/getPrice", async (req, res) => {
         res.status(200).json({price: price});
     } else {
         res.status(400).json({message: "something went wrong"});
+    }
+})
+
+
+// update package. can only update courier, recipient and weight and only if status is "sent" not "received"
+router.patch("/updatePackage/:id", async (req, res) => {
+    if (!req.user) {
+        return res.sendStatus(401);
+    }
+
+    if (req.user.role !== "office" && req.user.role !== "admin") {
+        return res.sendStatus(403);
+    }
+
+    if (!req.body.recipient && !req.body.weight && !req.body.courier) {
+        return res.sendStatus(200);
+    }
+
+    const pckg = await package.findById(req.params.id);
+
+    if (!pckg) {
+        return res.status(400).json({message: "Package not found!"});
+    }
+
+    if (pckg.status === "received") {
+        return res.status(400).json({message: "Cannot change a package which has already been received"});
+    }
+
+    if (req.body.weight) {
+        const newWeight = parseFloat(req.body.weight).toFixed(2);
+        if (!newWeight || newWeight < 0 || newWeight > 200) {
+            return res.status(400).json({message: "Invalid weight value"});
+        }
+
+        pckg.weight = newWeight;
+        const newPrice = calculatePackagePrice(pckg.weight, pckg.origin, pckg.destination);
+        if (!newPrice) {
+            return res.status(400).send("Problem calculating new price");
+        }
+
+        pckg.price = newPrice;
+    }
+
+    if (req.body.recipient) {
+        const newRecipient = await user.findOne({email: req.body.recipient});
+        if (!newRecipient) {
+            return res.status(400).json({message: "This recipient does not exist"});
+        }
+
+        pckg.recipient = newRecipient._id;
+    }
+
+    if (req.body.courier) {
+        const newCourier = await user.findOne({email: req.body.courier});
+        if (!newCourier) {
+            return res.status(400).json({message: "This courier does not exist"});
+        }
+
+        pckg.courier = newCourier._id;
+    }
+
+
+    try {
+        await pckg.save();
+        res.status(201).json({package: pckg});
+    } catch (e) {
+        res.status(500).send(e.message);
     }
 })
 
