@@ -54,7 +54,7 @@ router.get("/employeeAccess", authUser, async (req, res) => {
             return res.status(400).json({message: "Employee not found"});
         }
 
-        const packages = await getPackagesRegisteredByEmployee(employee._id);
+        const packages = await getPackagesRegisteredByEmployee(e._id);
         res.status(200).json({packages: packages});
     } else if (sentButNotReceived) { // packages which are sent but are not received
         const packages = await getPackagesWithStatusSent();
