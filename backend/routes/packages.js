@@ -84,7 +84,7 @@ router.get("/employeeAccess/userRelated/received/:usrEmail", authUser, async (re
         return res.status(400).json({message: "User email not found"});
     }
 
-    const packages = getPackagesReceivedByUser(usr._id);
+    const packages = await getPackagesReceivedByUser(usr._id);
     res.status(200).json({packages: packages});
 })
 
@@ -104,7 +104,7 @@ router.get("/employeeAccess/userRelated/sent/:usrEmail", authUser, async (req, r
         return res.status(400).json({message: "User email not found"});
     }
 
-    const packages = getPackagesSentByUser(usr._id);
+    const packages = await getPackagesSentByUser(usr._id);
     res.status(200).json({packages: packages});
 })
 
