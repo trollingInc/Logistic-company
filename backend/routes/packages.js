@@ -11,7 +11,8 @@ const {
     getPackagesWithStatusSent,
     getPackagesWithStatusReceived,
     getAllPackages,
-    getPackagesReceivedByUser
+    getPackagesReceivedByUser,
+    getPackagesSentByUser
 } = require("../utils/getPackages");
 
 const calculatePackagePrice = require("../utils/calculatePackagePrice");

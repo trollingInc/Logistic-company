@@ -64,7 +64,8 @@ function transformPackages(packages) {
         receiveDate: p.receiveDate || "to be received",
         origin: p.origin,
         destination: p.destination,
-        weight: p.weight
+        weight: p.weight,
+        price: p.price
     }));
 }
 
