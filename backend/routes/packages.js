@@ -202,7 +202,7 @@ router.post("/getPrice", async (req, res) => {
 
 
 // update package. can only update courier, recipient and weight and only if status is "sent" not "received"
-router.patch("/updatePackage/:id", async (req, res) => {
+router.patch("/updatePackage/:id", authUser, async (req, res) => {
     if (!req.user) {
         return res.sendStatus(401);
     }
