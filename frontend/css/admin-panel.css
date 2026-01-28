@@ -37,10 +37,41 @@
     color: grey;
 }
 
+#user-role-management-container {
+    display: flex; 
+    gap: 10px; 
+    align-items: center; 
+    margin-bottom: 30px; 
+    padding-bottom: 20px; 
+    border-bottom: 1px dashed #ccc;
+}
+
+#newRoleSelect {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0 20px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+#update-pricing-container {
+    width: 70vw;
+    max-width: 400px;
+}
+
 @media (max-width: 600px) {
     #pricing-form {
         min-width: none;
         max-width: none;
         width: 90vw;
+    }
+
+    .navbar {
+        font-size: 0.5rem;
+    }
+
+    .navbar .logo {
+        font-size: 0.55rem;
     }
 }

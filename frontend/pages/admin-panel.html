@@ -5,8 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <link rel="stylesheet" href="../css/admin-panel.css">
     <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/admin-panel.css">
     <script src="../scripts/admin-panel.js" defer></script>
     <script src="../scripts/auth.js" defer></script>
 </head>
@@ -24,21 +24,26 @@
     <div class="container">
         <div class="vp">
             <h3>Update pricing</h3>
-            <div class="form-group">
-                <label>Price Per Kg (euro)</label>
-                <input type="number" id="pricePerKg" step="1" min="1" placeholder="Enter new price...">
-            </div>
-            <div class="form-group">
-                <label>Price from address (euro)</label>
-                <input type="number" id="priceFromAddress" step="1" min="1" placeholder="Enter new price...">
-            </div>
-            <div class="form-group">
-                <label>Price to address (euro)</label>
-                <input type="number" id="priceToAddress" step="1" min="1" placeholder="Enter new price...">
-            </div>
-            <div class="form-group">
-                <label>Price to office (euro)</label>
-                <input type="number" id="priceToOffice" step="1" min="1" placeholder="Enter new price...">
+            <div id="update-pricing-container">
+                <div class="form-group">
+                    <label>Price per kg (euro)</label>
+                    <input type="number" id="pricePerKg" step="1" min="1" placeholder="Enter new price...">
+                </div>
+
+                <div class="form-group">
+                    <label>Price from address (euro)</label>
+                    <input type="number" id="priceFromAddress" step="1" min="1" placeholder="Enter new price...">
+                </div>
+
+                <div class="form-group">
+                    <label>Price to address (euro)</label>
+                    <input type="number" id="priceToAddress" step="1" min="1" placeholder="Enter new price...">
+                </div>
+
+                <div class="form-group">
+                    <label>Price to office (euro)</label>
+                    <input type="number" id="priceToOffice" step="1" min="1" placeholder="Enter new price...">
+                </div>
             </div>
 
             <button type="button" onclick="updatePricing()" class="btn-primary">Update Price</button>
@@ -49,7 +54,7 @@
         <p style="margin-bottom: 5px; color: #666;">Change a user's role using their email.</p>
 
         <div
-            style="display: flex; gap: 10px; align-items: flex-end; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px dashed #ccc;">
+            id="user-role-management-container">
             <div style="flex: 2;">
                 <label>User Email</label>
                 <input type="email" id="roleUserEmail" placeholder="user@example.com">
@@ -57,8 +62,7 @@
 
             <div style="flex: 2;">
                 <label>New Role</label>
-                <select id="newRoleSelect"
-                    style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                <select id="newRoleSelect">
                     <option value="user">User</option>
                     <option value="office">Office</option>
                     <option value="courier">Courier</option>
@@ -73,11 +77,11 @@
         <h3 style="color: #dc3545;">Delete User</h3>
         <p style="margin-bottom: 5px; color: #666;">Permanently remove a user using their email.</p>
 
-        <div style="display: flex; gap: 10px; align-items: flex-end;">
+        <div style="display: flex; gap: 10px; align-items: center;">
             <div style="flex: 3;">
                 
                 <input type="text" id="deleteUserEmail" placeholder="Paste User email here..."
-                    style="font-family: monospace;">
+                    style="font-family: monospace; margin: 8px;">
             </div>
             <button type="button" onclick="deleteUserByEmail()" class="btn-primary"
                 style="flex: 1; background-color: #dc3545;">Delete User</button>
