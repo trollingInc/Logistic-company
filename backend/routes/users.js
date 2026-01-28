@@ -139,12 +139,12 @@ router.delete("/", authUser, async (req, res) => {
     }
 
     if (req.user.role === "admin") {
-        if (!req.query.userId) {
-            return res.status(400).json({message: "No userId given"});
+        if (!req.query.email) {
+            return res.status(400).json({message: "No email given"});
         }
 
         try {
-            await user.deleteOne({_id: req.query.userId});
+            await user.deleteOne({email: req.query.email});
             res.sendStatus(200);
         } catch (e) {
             res.status(500).json({message: e.message});

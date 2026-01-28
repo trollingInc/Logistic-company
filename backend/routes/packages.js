@@ -109,37 +109,6 @@ router.get("/employeeAccess/userRelated/sent/:usrEmail", authUser, async (req, r
 })
 
 
-// change package status
-router.patch("/changeStatus/:id", authUser, async (req, res) => {
-    if (!req.user) {
-        return res.sendStatus(401);
-    }
-
-    if (req.user.role === "user") {
-        return res.sendStatus(403);
-    }
-
-    const pckg = await package.findById(req.params.id);
-
-    if (!pckg) {
-        return res.status(400).json({message: "Package not found!"});
-    }
-
-    if (pckg.receiveDate) {
-        return res.status(400).json({message: "Package has already been received"});
-    }
-
-    try {
-        pckg.status = "received";
-        pckg.receiveDate = Date.now();
-        await pckg.save();
-        res.sendStatus(200);
-    } catch (e) {
-        res.status(500).json({message: e.message});
-    }
-})
-
-
 // create package
 router.post("/", authUser, async (req, res) => {
     if (!req.user) {
@@ -254,6 +223,11 @@ router.patch("/updatePackage/:id", async (req, res) => {
 
     if (pckg.status === "received") {
         return res.status(400).json({message: "Cannot change a package which has already been received"});
+    }
+
+    if (req.body.status) {
+        pckg.status = "received";
+        pckg.receiveDate = Date.now();
     }
 
     if (req.body.weight) {
