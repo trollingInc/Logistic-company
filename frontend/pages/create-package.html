@@ -30,7 +30,24 @@
 
                 <div class="input-group">
                     <label>From (Origin)</label>
+                    <div style="margin-bottom: 10px; display: flex; gap: 15px;">
+                        <label style="font-weight: normal; cursor: pointer;">
+                            <input type="radio" name="originType" value="address" checked
+                                onclick="toggleDestinationInput(false)">
+                            From Address
+                        </label>
+                        <label style="font-weight: normal; cursor: pointer;">
+                            <input type="radio" name="originType" value="office"
+                                onclick="toggleDestinationInput(false)">
+                            From Office
+                        </label>
+                    </div>
                     <input type="text" id="origin" placeholder="Enter sender's address" required>
+                    <select id="originOfficeSelect"
+                        style="display: none; width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                        <option value="" disabled selected>Select an Office...</option>
+                    </select>
+                    
                 </div>
 
                 <div class="input-group">
@@ -39,12 +56,12 @@
                     <div style="margin-bottom: 10px; display: flex; gap: 15px;">
                         <label style="font-weight: normal; cursor: pointer;">
                             <input type="radio" name="destinationType" value="address" checked
-                                onclick="toggleDestinationInput()">
+                                onclick="toggleDestinationInput(true)">
                             To Address
                         </label>
                         <label style="font-weight: normal; cursor: pointer;">
                             <input type="radio" name="destinationType" value="office"
-                                onclick="toggleDestinationInput()">
+                                onclick="toggleDestinationInput(true)">
                             To Office
                         </label>
                     </div> 

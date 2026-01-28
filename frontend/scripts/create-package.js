@@ -1,9 +1,9 @@
 // Check package delivery price
 async function checkPrice() {
-    const origin = document.getElementById('origin').value;
 
-    const destination = getDestinationValue(); 
-    
+    const destination = getDestinationValue();
+    const origin = getOriginValue();
+
     const weight = document.getElementById('weight').value;
     const priceDisplay = document.getElementById('priceDisplay');
     const priceSpan = document.getElementById('calculatedPrice');
@@ -25,9 +25,9 @@ async function checkPrice() {
 
         if (response.ok) {
             // Show price
-            if(priceDisplay) priceDisplay.style.display = 'block';
-            if(priceDisplay) priceDisplay.style.color = 'green';
-            if(priceSpan) priceSpan.innerText = parseFloat(data.price).toFixed(2);
+            if (priceDisplay) priceDisplay.style.display = 'block';
+            if (priceDisplay) priceDisplay.style.color = 'green';
+            if (priceSpan) priceSpan.innerText = parseFloat(data.price).toFixed(2);
         } else {
             alert("Calculation Error: " + (data.message || "Unknown error"));
         }
@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     await loadOffices();
-    
+
     toggleDestinationInput();
 });
 
@@ -53,8 +53,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 async function createPackage(e) {
     if (e) e.preventDefault();
 
-    const destination = getDestinationValue(); 
-    const origin = document.getElementById('origin').value;
+    const destination = getDestinationValue();
+    const origin = getOriginValue();
 
     const packageData = {
         origin: origin,
@@ -69,14 +69,14 @@ async function createPackage(e) {
 
     try {
         const response = await fetch('http://localhost:5000/api/packages/', {
-             method: 'POST',
-             headers: {
-                 'Content-Type': 'application/json',
-                 'Authorization': 'Bearer ' + token
-             },
-             body: JSON.stringify(packageData)
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+            },
+            body: JSON.stringify(packageData)
         });
-        
+
         if (response.ok) {
             alert("Package created successfully!");
             window.location.href = 'employee-packages.html';
@@ -92,7 +92,7 @@ async function createPackage(e) {
 
 function getDestinationValue() {
     const radioAddress = document.querySelector('input[name="destinationType"][value="address"]');
-    
+
     if (radioAddress && radioAddress.checked) {
         // Return text input
         return document.getElementById('destinationAddressInput').value;
@@ -101,27 +101,36 @@ function getDestinationValue() {
         return document.getElementById('destinationOfficeSelect').value;
     }
 }
+function getOriginValue() {
+    const radioAddress = document.querySelector('input[name="originType"][value="address"]');
 
-function toggleDestinationInput() {
-    const radioAddress = document.querySelector('input[name="destinationType"][value="address"]');
-    const inputAddress = document.getElementById('destinationAddressInput');
-    const selectOffice = document.getElementById('destinationOfficeSelect');
+    if (radioAddress && radioAddress.checked) {
+        return document.getElementById('origin').value;
+    } else {
+        return document.getElementById('originOfficeSelect').value;
+    }
+}
+
+function toggleDestinationInput(from) {
+    const radioAddress = from ? document.querySelector('input[name="destinationType"][value="address"]') : document.querySelector('input[name="originType"][value="address"]');
+    const inputAddress = from ? document.getElementById('destinationAddressInput') : document.getElementById('origin');
+    const selectOffice = from ? document.getElementById('destinationOfficeSelect') : document.getElementById('originOfficeSelect');
 
     if (radioAddress.checked) {
         // Show Address Input
         inputAddress.style.display = 'block';
         inputAddress.required = true;
-        
+
         // Hide Office Select
         selectOffice.style.display = 'none';
         selectOffice.required = false;
-        selectOffice.value = ""; 
+        selectOffice.value = "";
     } else {
         // Hide Address Input
         inputAddress.style.display = 'none';
         inputAddress.required = false;
-        inputAddress.value = ""; 
-        
+        inputAddress.value = "";
+
         // Show Office Select
         selectOffice.style.display = 'block';
         selectOffice.required = true;
@@ -133,19 +142,28 @@ async function loadOffices() {
     try {
         const response = await fetch('http://localhost:5000/api/office');
         const data = await response.json();
-        
+
         const destSelect = document.getElementById('destinationOfficeSelect');
+        const originSelect = document.getElementById('originOfficeSelect');
 
         if (response.ok && data.offices) {
             // Reset dropdown
-            if(destSelect) destSelect.innerHTML = '<option value="" disabled selected>Select an Office...</option>';
+            if (destSelect) destSelect.innerHTML = '<option value="" disabled selected>Select an Office...</option>';
+            if (originSelect) originSelect.innerHTML = '<option value="" disabled selected>Select an Office...</option>';
 
             data.offices.forEach(office => {
-                if(destSelect) {
+                if (destSelect) {
                     const opt = document.createElement('option');
                     opt.value = office.address;
                     opt.textContent = office.address;
                     destSelect.appendChild(opt);
+
+                }
+                if (originSelect) {
+                    const opt = document.createElement('option');
+                    opt.value = office.address;
+                    opt.textContent = office.address;
+                    originSelect.appendChild(opt);
                 }
             });
         }
@@ -173,11 +191,11 @@ async function createNewOffice() {
 
         if (response.ok) {
             alert("Office created successfully!");
-            await loadOffices(); 
-            
+            await loadOffices();
+
             const officeRadio = document.querySelector('input[name="destinationType"][value="office"]');
             if (officeRadio) officeRadio.click();
-            
+
             const destSelect = document.getElementById('destinationOfficeSelect');
             if (destSelect) destSelect.value = address.trim();
 
