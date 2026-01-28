@@ -263,7 +263,7 @@ router.patch("/updatePackage/:id", async (req, res) => {
         }
 
         pckg.weight = newWeight;
-        const newPrice = calculatePackagePrice(pckg.weight, pckg.origin, pckg.destination);
+        const newPrice = await calculatePackagePrice(pckg.weight, pckg.origin, pckg.destination);
         if (!newPrice) {
             return res.status(400).send("Problem calculating new price");
         }
