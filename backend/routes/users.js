@@ -93,10 +93,6 @@ router.patch("/changeRole", authUser, async (req, res) => {
 })
 
 router.patch("/changePassword", async (req, res) => {
-    if (!req.user) {
-        return res.sendStatus(401);
-    } 
-
     if (!req.body.newPass || !req.body.oldPass || !req.body.email) {
         return res.status(400).json({message: "Missing data"});
     }
