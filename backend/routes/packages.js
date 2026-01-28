@@ -211,7 +211,7 @@ router.patch("/updatePackage/:id", authUser, async (req, res) => {
         return res.sendStatus(403);
     }
 
-    if (!req.body.recipient && !req.body.weight && !req.body.courier) {
+    if (!req.body.recipient && !req.body.weight && !req.body.courier && !req.body.status) {
         return res.sendStatus(200);
     }
 
