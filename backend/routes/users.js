@@ -92,16 +92,16 @@ router.patch("/changeRole", authUser, async (req, res) => {
     
 })
 
-router.patch("/changePassword", authUser, async (req, res) => {
+router.patch("/changePassword", async (req, res) => {
     if (!req.user) {
         return res.sendStatus(401);
     } 
 
-    if (!req.body.newPass || !req.body.oldPass) {
+    if (!req.body.newPass || !req.body.oldPass || !req.body.email) {
         return res.status(400).json({message: "Missing data"});
     }
 
-    const usr = await user.findById(req.user.id);
+    const usr = await user.findOne({email: req.body.email});
     if (!usr) {
         return res.status(400).json({message: "You don't exist."});
     }
