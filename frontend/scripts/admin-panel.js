@@ -5,12 +5,13 @@ if (sessionStorage.getItem("userRole") === "admin") {
 async function updatePricing() {
     const priceInput = document.getElementById('pricePerKg');
     const priceVal = priceInput.value;
+    const priceFromAddress = document.getElementById('priceFromAddress')
+    const priceToAddress = document.getElementById('priceToAddress')
+
+    const priceToOffice = document.getElementById('priceToOffice')
+
     const token = sessionStorage.getItem('jwt');
 
-    if (!priceVal || priceVal <= 0) {
-        alert("Please enter a valid price greater than 0.");
-        return;
-    }
 
     try {
 
@@ -21,13 +22,20 @@ async function updatePricing() {
                 'Authorization': 'Bearer ' + token
             },
             body: JSON.stringify({
-                pricePerKg: priceVal
+                pricePerKg: priceVal,
+                priceFromAddress:priceFromAddress.value,
+                priceToAddress: priceToAddress.value,
+                priceToOffice: priceToOffice.value
+
             })
         });
 
         if (response.ok) {
-            alert("Price per Kg updated successfully!");
+            alert("Price updated successfully!");
             priceInput.value = "";
+            priceFromAddress.value = "";
+            priceToAddress.value = "";
+            priceToOffice.value = "";
         } else {
             const data = await response.json();
             alert("Error: " + (data.message || "Update failed"));

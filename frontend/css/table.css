@@ -53,3 +53,45 @@
 .btn-receive {
     background-color: #28a745;
 }
+@media screen and (max-width: 768px) {
+  
+  /* 1. Force table elements to behave like blocks (stacking them) */
+  table, thead, tbody, th, td, tr {
+    display: block;
+  }
+
+  /* 2. Hide the table headers (but keep them accessible for screen readers) */
+  thead tr {
+    position: absolute;
+    top: -9999px;
+    left: -9999px;
+  }
+
+  /* 3. Style each row as a "card" */
+  tr {
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-bottom: 3px solid #ddd;
+  }
+
+  /* 4. Style the cells to look like rows within the card */
+  td {
+    border: none;
+    border-bottom: 1px solid #eee;
+    position: relative;
+    padding-left: 50%; /* Make space for the label */
+    text-align: right; /* text aligns to right */
+  }
+
+  /* 5. Add the "Label" using the data-label attribute */
+  td::before {
+    content: attr(data-label); /* Grabs the text from HTML */
+    position: absolute;
+    left: 10px;
+    width: 45%;
+    padding-right: 10px;
+    white-space: nowrap;
+    text-align: left;
+    font-weight: bold;
+  }
+}

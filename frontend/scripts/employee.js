@@ -172,6 +172,7 @@ async function generateReport() {
                     <th style="background:#444; color:white;">Date</th>
                     <th style="background:#444; color:white;">Sender</th>
                     <th style="background:#444; color:white;">Recipient</th>
+                    <th style="background:#444; color:white;">Weight</th>
                     <th style="background:#444; color:white;">Route</th>
                     <th style="background:#444; color:white;">Status</th>
                     <th style="background:#444; color:white;">Price</th>
@@ -189,6 +190,7 @@ async function generateReport() {
                         <td>${date}</td>
                         <td>${sender}</td>
                         <td>${recipient}</td>
+                        <td>${pkg.weight} kg</td>
                         <td>${pkg.origin} &rarr; ${pkg.destination}</td>
                         <td>${pkg.status}</td>
                         <td style="font-weight:bold;">${pkg.price ? pkg.price.toFixed(2) : '0.00'} euro</td>

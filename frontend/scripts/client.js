@@ -26,7 +26,7 @@ console.log(sender);
                         <td>${sender}</td>
                         <td>${receiver}</td>
                         <td>${pkg.origin} &rarr; ${pkg.destination}</td>
-                        <td>${pkg.weight}</td>
+                        <td>${pkg.weight} kg</td>
                         <td style="font-weight:bold;">${pkg.price ? pkg.price.toFixed(2) : '0.00'} euro</td>
                         <td>${pkg.status}</td>
                     </tr>`;
@@ -38,7 +38,7 @@ console.log(sender);
                         <td>${sender}</td>
                         <td>${receiver}</td>
                         <td>${pkg.origin} &rarr; ${pkg.destination}</td>
-                        <td>${pkg.weight}</td>
+                        <td>${pkg.weight} kg</td>
                         <td style="font-weight:bold;">${pkg.price ? pkg.price.toFixed(2) : '0.00'} euro</td>
                         <td>${pkg.status}</td>
                     </tr>`;
