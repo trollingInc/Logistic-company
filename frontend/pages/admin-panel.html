@@ -6,18 +6,69 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link rel="stylesheet" href="../css/admin-panel.css">
+    <link rel="stylesheet" href="../css/style.css">
     <script src="../scripts/admin-panel.js" defer></script>
+    <script src="../scripts/auth.js" defer></script>
 </head>
 
 <body>
-    <div class="vp">
-        <h3>Update pricing</h3>
-        <label id="form-disclaimer"><em>*Updates to pricing will not be reflected in packages which are already
-                created</em></label>
-        <form onsubmit="updatePricing(); return false;" id="pricing-form">
-            <label for="price-per-kg">Price per kg</label>
-            <input type="text" name="price-per-kg" id="price-per-kg">
-        </form>
+    <nav class="navbar">
+        <div class="logo">Speedier (Employee)</div>
+        <ul class="nav-links">
+            <li><a href="create-package.html">Create package</a></li>
+            <li><a href="employee-packages.html">All packages</a></li>
+            <li><a href="#" onclick="logout()">Log out</a></li>
+        </ul>
+    </nav>
+    <div class="container">
+        <div class="vp">
+            <h3>Update pricing</h3>
+            <div class="form-group">
+                <label>Price Per Kg (euro)</label>
+                <input type="number" id="pricePerKg" step="1" min="1" placeholder="Enter new price...">
+            </div>
+
+            <button type="button" onclick="updatePricing()" class="btn-primary">Update Price</button>
+        </div>
+        <hr style="margin: 30px 0; border: 0; border-top: 2px dashed #ccc;">
+
+        <h3 style="color: #333;">User Role Management</h3>
+        <p style="margin-bottom: 5px; color: #666;">Change a user's role using their email.</p>
+
+        <div
+            style="display: flex; gap: 10px; align-items: flex-end; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px dashed #ccc;">
+            <div style="flex: 2;">
+                <label>User Email</label>
+                <input type="email" id="roleUserEmail" placeholder="user@example.com">
+            </div>
+
+            <div style="flex: 2;">
+                <label>New Role</label>
+                <select id="newRoleSelect"
+                    style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                    <option value="user">User</option>
+                    <option value="office">Office</option>
+                    <option value="courier">Courier</option>
+                    <option value="admin">Admin</option>
+                </select>
+            </div>
+
+            <button type="button" onclick="updateUserRoleByEmail()" class="btn-primary" style="flex: 1;">Update
+                Role</button>
+        </div>
+
+        <h3 style="color: #dc3545;">Delete User</h3>
+        <p style="margin-bottom: 5px; color: #666;">Permanently remove a user using their email.</p>
+
+        <div style="display: flex; gap: 10px; align-items: flex-end;">
+            <div style="flex: 3;">
+                
+                <input type="text" id="deleteUserEmail" placeholder="Paste User email here..."
+                    style="font-family: monospace;">
+            </div>
+            <button type="button" onclick="deleteUserByEmail()" class="btn-primary"
+                style="flex: 1; background-color: #dc3545;">Delete User</button>
+        </div>
     </div>
 </body>
 

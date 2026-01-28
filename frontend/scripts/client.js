@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', async () => {
     const token = sessionStorage.getItem('jwt');
     const myEmail = sessionStorage.getItem('userEmail');
-    
+
     if (!token) return location.href = 'login.html';
 
     const response = await fetch('http://localhost:5000/api/packages/', {

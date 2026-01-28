@@ -40,21 +40,21 @@ async function generateReport() {
     // Reset UI
     tableBody.innerHTML = '<tr><td colspan="6">Loading data...</td></tr>';
     if (revenueDisplay) revenueDisplay.style.display = 'none';
-    tableHead.innerHTML = ''; 
+    tableHead.innerHTML = '';
 
     try {
         let url = '';
         let dataKey = 'packages'; // Default key in JSON response
         let isUserReport = false; // Flag to render user table vs package table
 
-        // --- CONSTRUCT URL BASED ON TYPE ---
+        //CONSTRUCT URL BASED ON TYPE
         switch (type) {
             case 'all_employees': // a.
                 url = 'http://localhost:5000/api/users/employees';
                 dataKey = 'employees';
                 isUserReport = true;
                 break;
-                
+
             case 'all_clients': // b.
                 url = 'http://localhost:5000/api/users/customers';
                 dataKey = 'customers';
@@ -66,7 +66,7 @@ async function generateReport() {
                 break;
 
             case 'by_employee': // d.
-                if(!email) { alert("Please enter an employee email"); return; }
+                if (!email) { alert("Please enter an employee email"); return; }
                 url = `http://localhost:5000/api/packages/employeeAccess?employee=${email}`;
                 break;
 
@@ -75,12 +75,12 @@ async function generateReport() {
                 break;
 
             case 'sent_by_client': // f.
-                if(!email) { alert("Please enter a client email"); return; }
+                if (!email) { alert("Please enter a client email"); return; }
                 url = `http://localhost:5000/api/packages/employeeAccess/userRelated/sent/${email}`;
                 break;
 
             case 'received_by_client': // g.
-                if(!email) { alert("Please enter a client email"); return; }
+                if (!email) { alert("Please enter a client email"); return; }
                 url = `http://localhost:5000/api/packages/employeeAccess/userRelated/received/${email}`;
                 break;
             case 'revenue': // h.
@@ -93,7 +93,7 @@ async function generateReport() {
         const response = await fetch(url, {
             headers: { 'Authorization': 'Bearer ' + token }
         });
-        
+
         const data = await response.json();
         console.log(data);
 
@@ -116,15 +116,16 @@ async function generateReport() {
             }
 
             // Convert to timestamps for comparison
-            const startDate = new Date(startStr).setHours(0,0,0,0);
-            const endDate = new Date(endStr).setHours(23,59,59,999);
+            const startDate = new Date(startStr).setHours(0, 0, 0, 0);
+            const endDate = new Date(endStr).setHours(23, 59, 59, 999);
             let total = 0;
 
             // Filter packages
             const filtered = list.filter(pkg => {
-                if(!pkg.sendDate) return false; 
+                if (!pkg.sendDate) return false;
                 const pkgDate = new Date(pkg.sendDate).getTime();
-                return pkgDate >= startDate && pkgDate <= endDate;
+                return pkgDate >= startDate && pkgDate <= endDate && pkg.status == "received"
+
             });
 
             // Calculate Sum
@@ -133,9 +134,9 @@ async function generateReport() {
             // Update UI
             if (revenueDisplay) revenueDisplay.style.display = 'block';
             if (revenueAmount) revenueAmount.innerText = total.toFixed(2);
-            
+
             // Show only the relevant packages in the table
-            list = filtered; 
+            list = filtered;
         }
 
         //RENDER TABLE
@@ -152,7 +153,7 @@ async function generateReport() {
                     <th style="background:#444; color:white;">Role</th>
                     <th style="background:#444; color:white;">ID</th>
                 </tr>`;
-            
+
             tableBody.innerHTML = '';
             list.forEach(u => {
                 tableBody.innerHTML += `
@@ -167,6 +168,7 @@ async function generateReport() {
             // RENDER PACKAGES
             tableHead.innerHTML = `
                 <tr>
+                    <th style="background:#444; color:white;">ID</th>
                     <th style="background:#444; color:white;">Date</th>
                     <th style="background:#444; color:white;">Sender</th>
                     <th style="background:#444; color:white;">Recipient</th>
@@ -174,15 +176,16 @@ async function generateReport() {
                     <th style="background:#444; color:white;">Status</th>
                     <th style="background:#444; color:white;">Price</th>
                 </tr>`;
-            
+
             tableBody.innerHTML = '';
             list.forEach(pkg => {
                 const sender = pkg.sentBy?.email || pkg.sentBy || 'N/A';
                 const recipient = pkg.recipient?.email || pkg.recipient || 'N/A';
                 const date = new Date(pkg.sendDate).toLocaleDateString('bg-BG');
-                
+
                 tableBody.innerHTML += `
                     <tr>
+                        <td>${pkg.id}</td>
                         <td>${date}</td>
                         <td>${sender}</td>
                         <td>${recipient}</td>
@@ -201,7 +204,7 @@ async function generateReport() {
 
 // Function to delete a package (Must be global for onclick)
 async function deletePackage(id) {
-    if(!confirm('Сигурни ли сте, че искате да изтриете тази пратка?')) return;
+    if (!confirm('Сигурни ли сте, че искате да изтриете тази пратка?')) return;
     const token = sessionStorage.getItem('jwt');
     try {
         await fetch(`http://localhost:5000/api/packages/${id}`, {
@@ -223,7 +226,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Load initial "All Packages" table for the Employee Dashboard
     const mainTableBody = document.getElementById('allPackagesBody');
-    
+
     if (mainTableBody) {
         try {
             const response = await fetch('http://localhost:5000/api/packages/employeeAccess', {
@@ -250,6 +253,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                     mainTableBody.innerHTML += `
                         <tr>
+                            <td>${pkg.id}</td>
                             <td>${date}</td>
                             <td>${sender}</td>
                             <td>${recipient}</td>
