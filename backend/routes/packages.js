@@ -256,7 +256,7 @@ router.patch("/updatePackage/:id", authUser, async (req, res) => {
 
     if (req.body.courier) {
         const newCourier = await user.findOne({email: req.body.courier});
-        if (!newCourier) {
+        if (!newCourier || newCourier.role !== "courier") {
             return res.status(400).json({message: "This courier does not exist"});
         }
 
